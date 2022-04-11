@@ -31,3 +31,21 @@ spec:
             value: Sqlite
           - name: ConnectionStrings__ToDoDb
             value: "Filename=/data/todo-list-lab.db"
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: todo-web-lab-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: todo-web-lab-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Mi
