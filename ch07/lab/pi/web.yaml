@@ -21,3 +21,16 @@ spec:
           ports:
             - containerPort: 80
               name: http
+
+# Command inside the container is: dotnet Pi.Web.dll
+# Also has some options:
+#  /app # dotnet Pi.Web.dll -m
+#  Usage - Pi.Web -options
+#
+#  GlobalOption          Description
+#  Mode (-m)             Run mode [Default='console']
+#  Web
+#  Console
+#  File
+#  DecimalPlaces (-dp)   Decimal places to calculate [Default='20']
+#  OutputPath (-o)       Output path for file mode [Default='/pi.txt']
