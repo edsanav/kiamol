@@ -14,6 +14,19 @@ spec:
       labels:
         app: pi-web
     spec:
+      initContainers:
+        - name: init-script
+          image: kiamol/ch05-pi
+          command: [ 'sh', '-c', "echo '#!/bin/sh\ndotnet Pi.Web.dll -m Web' > /init-out/startup.sh  && chmod a+x /init-out/startup.sh" ]
+          volumeMounts:
+            - name: scripts-dir
+              mountPath: /init-out
+        - name: init-html
+          image: kiamol/ch05-pi
+          command: ['sh', '-c', "echo '<!DOCTYPE html><html><body><h1>v2</h1></body></html>' > /versions/index.html"]
+          volumeMounts:
+            - mountPath: /versions
+              name: version-dir
       containers:
         - image: kiamol/ch05-pi
           command: ["/scripts/startup.sh"]
@@ -21,16 +34,20 @@ spec:
           ports:
             - containerPort: 80
               name: http
-
-# Command inside the container is: dotnet Pi.Web.dll
-# Also has some options:
-#  /app # dotnet Pi.Web.dll -m
-#  Usage - Pi.Web -options
-#
-#  GlobalOption          Description
-#  Mode (-m)             Run mode [Default='console']
-#  Web
-#  Console
-#  File
-#  DecimalPlaces (-dp)   Decimal places to calculate [Default='20']
-#  OutputPath (-o)       Output path for file mode [Default='/pi.txt']
+          volumeMounts:
+            - name: scripts-dir
+              mountPath: /scripts
+        - image: kiamol/ch05-pi
+          command: ['sh', '-c', 'while true; do echo -e "HTTP/1.1 200 OK\nContent-Type: text/html\nContent-Length: 62\n\n$(cat /versions/index.html)" | nc -l -p 8080; done']
+          name: web-version
+          ports:
+            - containerPort: 8080
+              name: http
+          volumeMounts:
+            - name: version-dir
+              mountPath: /versions
+      volumes:
+        - name: scripts-dir
+          emptyDir: {}
+        - name: version-dir
+          emptyDir: {}
