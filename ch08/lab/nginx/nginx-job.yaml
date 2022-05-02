@@ -1,0 +1,32 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: size-job
+  labels:
+    kiamol: ch08-lab
+spec:
+  template:
+    spec:
+      containers:
+        - name: calculator
+          image: kiamol/ch03-sleep
+          command: ["du", "-sh", "nginx0", "nginx1","nginx2"]
+          volumeMounts:
+            - name: nginx0
+              mountPath: /nginx0/
+            - name: nginx1
+              mountPath: /nginx1/
+            - name: nginx2
+              mountPath: /nginx2/
+
+      restartPolicy: Never
+      volumes:
+        - name: nginx0
+          persistentVolumeClaim:
+            claimName: logs-nginx-0
+        - name: nginx1
+          persistentVolumeClaim:
+            claimName: logs-nginx-1
+        - name: nginx2
+          persistentVolumeClaim:
+            claimName: logs-nginx-2
